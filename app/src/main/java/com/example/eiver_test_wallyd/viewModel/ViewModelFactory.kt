@@ -9,8 +9,8 @@ class ViewModelFactory(private val apiHelper: ApiHelper) : ViewModelProvider.Fac
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         when {
-            modelClass.isAssignableFrom(MovieViewModel::class.java) -> {
-                return MovieViewModel(MovieRepository(apiHelper)) as T
+            modelClass.isAssignableFrom(MoviesViewModel::class.java) -> {
+                return MoviesViewModel(MovieRepository(apiHelper)) as T
             }
             else -> throw IllegalArgumentException("Unknown class name")
         }
