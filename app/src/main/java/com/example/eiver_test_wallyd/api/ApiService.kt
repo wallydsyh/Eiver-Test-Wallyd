@@ -1,7 +1,8 @@
 package com.example.eiver_test_wallyd.api
 
-import com.example.eiver_test_wallyd.model.MovieDetailResponse
+import com.example.eiver_test_wallyd.model.MovieDetails
 import com.example.eiver_test_wallyd.model.MoviesResponse
+import com.example.eiver_test_wallyd.model.VideosResponse
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -18,7 +19,13 @@ interface ApiService {
     fun getMovieDetails(
         @Path("movie_id") movieId: Long,
         @Query("api_key") apiKey: String
-    ): Single<MovieDetailResponse>
+    ): Single<MovieDetails>
+
+    @GET("movie/{movie_id}/videos")
+    fun getMovieVideos(
+        @Path("movie_id") movieId: Long,
+        @Query("api_key") apiKey: String
+    ): Single<VideosResponse>
 
 
 }

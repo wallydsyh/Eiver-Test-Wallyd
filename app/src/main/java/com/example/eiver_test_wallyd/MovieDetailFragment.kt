@@ -5,7 +5,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.eiver_test_wallyd.adapter.MovieDetailsAdapter
+import com.example.eiver_test_wallyd.databinding.FragmentMovieDetailBinding
+import com.example.eiver_test_wallyd.model.ImageMovie
 import com.example.eiver_test_wallyd.model.Movie
+import com.example.eiver_test_wallyd.utils.ImageUtils
+import com.example.eiver_test_wallyd.viewModel.MoviesViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 private const val ARG_MOVIE = "arg_movie"
@@ -18,20 +28,63 @@ private const val ARG_MOVIE = "arg_movie"
 class MovieDetailFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var movie: Movie? = null
+    private lateinit var binding: FragmentMovieDetailBinding
+    private val moviesViewModel: MoviesViewModel by activityViewModels()
+    private  lateinit  var movieDetailsAdapter : MovieDetailsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             movie = it.getParcelable(ARG_MOVIE)
         }
+        movieDetailsAdapter = MovieDetailsAdapter()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_movie_detail, container, false)
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_movie_detail, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupObserver()
+        setUpListener()
+    }
+
+
+    fun setUpListener() {
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(binding.root.context, LinearLayout.HORIZONTAL, false)
+            adapter = movieDetailsAdapter
+
+        }
+
+    }
+
+    private fun setupObserver() {
+        moviesViewModel.movieDetails.observe(viewLifecycleOwner, Observer {
+            binding.textViewTitle.text = it.title
+            binding.synopsis.text = it.overview
+            binding.textViewDate.text = it.releaseDate
+            val imageMovie = it.posterPath?.let { it1 -> ImageMovie(it1).small }
+            ImageUtils().displayImageFromUrl(
+                binding.root.context,
+                imageMovie.toString(),
+                binding.imageViewPoster,
+                null
+            )
+        })
+
+        moviesViewModel.movieVideos.observe(viewLifecycleOwner, Observer {
+            movieDetailsAdapter.videosList = it.results
+            movieDetailsAdapter.notifyDataSetChanged()
+
+        })
     }
 
     companion object {

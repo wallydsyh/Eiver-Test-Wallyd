@@ -4,8 +4,9 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.eiver_test_wallyd.Constant.ApiKey.apiKey
-import com.example.eiver_test_wallyd.model.MovieDetailResponse
+import com.example.eiver_test_wallyd.model.MovieDetails
 import com.example.eiver_test_wallyd.model.MoviesResponse
+import com.example.eiver_test_wallyd.model.VideosResponse
 import com.example.eiver_test_wallyd.repository.MovieRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -17,9 +18,10 @@ class MoviesViewModel(
 
     var compositeDisposable = CompositeDisposable()
     var movieList = MutableLiveData<MoviesResponse>()
-    var movieDetails = MutableLiveData<MovieDetailResponse>()
+    var movieDetails = MutableLiveData<MovieDetails>()
+    var movieVideos = MutableLiveData<VideosResponse>()
 
-    fun getMovies( page: Int) {
+    fun getMovies(page: Int) {
         compositeDisposable.add(
             movieRepository.getMovie(apiKey, page)
                 .subscribeOn(Schedulers.io())
@@ -33,7 +35,7 @@ class MoviesViewModel(
 
     }
 
-    fun getMovieDetail(movieId: Long) { //TODO remove key and put in Constant
+    fun getMovieDetail(movieId: Long) {
         compositeDisposable.add(
             movieRepository.getMovieDetails(movieId, apiKey)
                 .subscribeOn(Schedulers.io())
@@ -42,10 +44,24 @@ class MoviesViewModel(
                     movieDetails.postValue(it)
 
                 }, {
-                    Log.d("wallydSyh", it.localizedMessage)
+                    //TODO handle Error
                 })
         )
 
+    }
+
+    fun getMovieVideos(movieId: Long) {
+        compositeDisposable.add(
+            movieRepository.getMovieVideos(movieId, apiKey)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    movieVideos.postValue(it)
+
+                }, {
+                    //TODO handle Error
+                })
+        )
     }
 
     override fun onCleared() {
