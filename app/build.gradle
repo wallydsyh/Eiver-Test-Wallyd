@@ -78,5 +78,8 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 
+    implementation "com.google.android.exoplayer:exoplayer:$exoPlayer"
+    implementation "com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5"
+
 
 }

@@ -1,6 +1,7 @@
 package com.example.eiver_test_wallyd
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +25,6 @@ class MoviesFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         movieAdapter = MoviesAdapter()
-        movieViewModel.getMovies(1)
     }
 
     override fun onCreateView(
@@ -49,6 +49,7 @@ class MoviesFragment : Fragment() {
             movieAdapter.onMovieClick = {
                 movieViewModel.getMovieDetail(it.id)
                 movieViewModel.getMovieVideos(it.id)
+                Log.d("MovieId", it.id.toString())
                 displayMovieDetailFragment(it)
             }
         }

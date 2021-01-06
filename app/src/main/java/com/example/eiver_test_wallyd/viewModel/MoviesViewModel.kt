@@ -29,7 +29,7 @@ class MoviesViewModel(
                 .subscribe({
                     movieList.postValue(it)
                 }, {
-
+                    Log.d("WallydSyh", it.localizedMessage)
                 })
         )
 

@@ -16,6 +16,11 @@ import com.example.eiver_test_wallyd.model.ImageMovie
 import com.example.eiver_test_wallyd.model.Movie
 import com.example.eiver_test_wallyd.utils.ImageUtils
 import com.example.eiver_test_wallyd.viewModel.MoviesViewModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
 
 // TODO: Rename parameter arguments, choose names that match
 private const val ARG_MOVIE = "arg_movie"
@@ -30,7 +35,7 @@ class MovieDetailFragment : Fragment() {
     private var movie: Movie? = null
     private lateinit var binding: FragmentMovieDetailBinding
     private val moviesViewModel: MoviesViewModel by activityViewModels()
-    private  lateinit  var movieDetailsAdapter : MovieDetailsAdapter
+    private lateinit var movieDetailsAdapter: MovieDetailsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,11 +61,19 @@ class MovieDetailFragment : Fragment() {
         setUpListener()
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+    }
 
-    fun setUpListener() {
+
+    private fun setUpListener() {
         binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(binding.root.context, LinearLayout.HORIZONTAL, false)
+            layoutManager =
+                LinearLayoutManager(binding.root.context, LinearLayout.HORIZONTAL, false)
             adapter = movieDetailsAdapter
+            movieDetailsAdapter.onVideoClick = {
+                (activity as MainActivity).initializePlayer(it)
+            }
 
         }
 
@@ -71,7 +84,7 @@ class MovieDetailFragment : Fragment() {
             binding.textViewTitle.text = it.title
             binding.synopsis.text = it.overview
             binding.textViewDate.text = it.releaseDate
-            val imageMovie = it.posterPath?.let { it1 -> ImageMovie(it1).small }
+            val imageMovie = it.posterPath?.let { it1 -> ImageMovie(it1).large }
             ImageUtils().displayImageFromUrl(
                 binding.root.context,
                 imageMovie.toString(),
@@ -85,6 +98,13 @@ class MovieDetailFragment : Fragment() {
             movieDetailsAdapter.notifyDataSetChanged()
 
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        movieDetailsAdapter.binding?.youtubePlayerView?.removeYouTubePlayerListener(
+            movieDetailsAdapter.callback
+        )
     }
 
     companion object {
@@ -105,4 +125,6 @@ class MovieDetailFragment : Fragment() {
                 }
             }
     }
+
+
 }

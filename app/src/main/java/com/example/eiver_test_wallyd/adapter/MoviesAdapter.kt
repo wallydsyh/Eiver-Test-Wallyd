@@ -33,7 +33,7 @@ class MoviesAdapter() :
         binding.date.text = item.releaseDate
         binding.synopsis.text = item.overview
         val url = item.posterPath?.let {
-            ImageMovie(it).small
+            ImageMovie(it).medium
         }
         ImageUtils().displayImageFromUrl(
             holder.itemView.context,
