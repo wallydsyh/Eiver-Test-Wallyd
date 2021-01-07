@@ -5,12 +5,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.eiver_test_wallyd.R
 import com.example.eiver_test_wallyd.api.ApiHelper
 import com.example.eiver_test_wallyd.api.ApiServiceImpl
 import com.example.eiver_test_wallyd.databinding.ActivityMainBinding
 import com.example.eiver_test_wallyd.viewModel.MoviesViewModel
 import com.example.eiver_test_wallyd.viewModel.ViewModelFactory
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +36,8 @@ class MainActivity : AppCompatActivity() {
             ViewModelProvider(this, ViewModelFactory(ApiHelper(ApiServiceImpl()))).get(
                 MoviesViewModel::class.java
             )
-        moviesViewModel.getMovies(1)
+        lifecycleScope.launch {
+           // moviesViewModel.getMovies(1)
+        }
     }
 }

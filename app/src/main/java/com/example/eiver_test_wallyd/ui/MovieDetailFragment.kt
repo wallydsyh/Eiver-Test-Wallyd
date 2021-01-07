@@ -1,6 +1,7 @@
 package com.example.eiver_test_wallyd.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.eiver_test_wallyd.Constant.ApiKey
 import com.example.eiver_test_wallyd.R
 import com.example.eiver_test_wallyd.adapter.MovieDetailsAdapter
 import com.example.eiver_test_wallyd.databinding.FragmentMovieDetailBinding
@@ -16,8 +21,10 @@ import com.example.eiver_test_wallyd.model.ImageMovie
 import com.example.eiver_test_wallyd.model.Movie
 import com.example.eiver_test_wallyd.utils.Dialog
 import com.example.eiver_test_wallyd.utils.ImageUtils
+import com.example.eiver_test_wallyd.utils.Resource
 import com.example.eiver_test_wallyd.viewModel.MoviesViewModel
 import com.example.eiver_test_wallyd.utils.Status
+import kotlinx.coroutines.*
 
 private const val ARG_MOVIE = "arg_movie"
 
@@ -64,18 +71,17 @@ class MovieDetailFragment : Fragment() {
         }
         movieDetailsAdapter.binding?.youtubePlayerView?.let {
             viewLifecycleOwner.lifecycle.addObserver(it)
-        };
+        }
     }
 
     private fun setupObserver() {
-        moviesViewModel.movieDetails.observe(viewLifecycleOwner, Observer { resource ->
-            when (resource.status) {
-                Status.Loading -> updateLoadingIndicatorVisibility(true)
-                Status.Success -> {
-                    updateLoadingIndicatorVisibility(false)
-                    binding.textViewTitle.text = resource.data?.title
-                    binding.synopsis.text = resource.data?.overview
-                    val imageMovie = resource.data?.posterPath?.let { it1 -> ImageMovie(it1).large }
+        viewLifecycleOwner.lifecycleScope.launch {
+            movie?.id?.let {
+                moviesViewModel.getMovieDetails(it).run {
+                    binding.textViewTitle.text = this.title
+                    binding.textViewTitle.text = this.title
+                    binding.synopsis.text = this.overview
+                    val imageMovie = this.posterPath?.let { it1 -> ImageMovie(it1).large }
                     ImageUtils().displayImageFromUrl(
                         binding.root.context,
                         imageMovie.toString(),
@@ -83,33 +89,12 @@ class MovieDetailFragment : Fragment() {
                         null
                     )
                 }
-                Status.Error -> {
-                    updateLoadingIndicatorVisibility(false)
-                    Dialog().displayDialog(binding.root.context,
-                        getString(R.string.error_title),
-                        getString(
-                            R.string.error_message)).show()
+                moviesViewModel.getVideos(it).run {
+                    movieDetailsAdapter.videosList = this.results
+                    movieDetailsAdapter.notifyDataSetChanged()
                 }
             }
-
-        })
-
-        moviesViewModel.movieVideos.observe(viewLifecycleOwner, Observer {
-
-            when (it.status) {
-                Status.Success -> {
-                    updateLoadingIndicatorVisibility(false)
-                    it.data?.let { videosResponse ->
-                        movieDetailsAdapter.videosList = videosResponse.results
-                        movieDetailsAdapter.notifyDataSetChanged()
-                    }
-                }
-                Status.Error -> {
-                    updateLoadingIndicatorVisibility(false)
-                }
-            }
-
-        })
+        }
     }
 
     private fun updateLoadingIndicatorVisibility(enable: Boolean) {

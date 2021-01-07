@@ -1,31 +1,32 @@
 package com.example.eiver_test_wallyd.api
 
+import androidx.lifecycle.MutableLiveData
 import com.example.eiver_test_wallyd.model.MovieDetails
 import com.example.eiver_test_wallyd.model.MoviesResponse
 import com.example.eiver_test_wallyd.model.VideosResponse
-import io.reactivex.rxjava3.core.Single
+import com.example.eiver_test_wallyd.utils.Resource
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
     @GET("movie/popular")
-    fun getMovies(
+    suspend fun getMovies(
         @Query("api_key") apiKey: String,
         @Query("page") page: Int
-    ): Single<MoviesResponse>
+    ): MoviesResponse
 
     @GET("movie/{movie_id}")
-    fun getMovieDetails(
+    suspend fun getMovieDetails(
         @Path("movie_id") movieId: Long,
         @Query("api_key") apiKey: String
-    ): Single<MovieDetails>
+    ): MovieDetails
 
     @GET("movie/{movie_id}/videos")
-    fun getVideos(
+    suspend fun getVideos(
         @Path("movie_id") movieId: Long,
         @Query("api_key") apiKey: String
-    ): Single<VideosResponse>
+    ): VideosResponse
 
 
 }

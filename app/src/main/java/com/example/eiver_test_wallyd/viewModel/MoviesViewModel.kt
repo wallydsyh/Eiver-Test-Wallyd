@@ -1,16 +1,15 @@
 package com.example.eiver_test_wallyd.viewModel
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.example.eiver_test_wallyd.Constant.ApiKey.apiKey
-import com.example.eiver_test_wallyd.model.MovieDetails
-import com.example.eiver_test_wallyd.model.MoviesResponse
-import com.example.eiver_test_wallyd.model.VideosResponse
+import com.example.eiver_test_wallyd.MoviesPagingSource
+import com.example.eiver_test_wallyd.model.*
 import com.example.eiver_test_wallyd.repository.MovieRepository
 import com.example.eiver_test_wallyd.utils.Resource
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 
 class MoviesViewModel(
     private val movieRepository: MovieRepository
@@ -21,47 +20,17 @@ class MoviesViewModel(
     var movieDetails = MutableLiveData<Resource<MovieDetails>>()
     var movieVideos = MutableLiveData<Resource<VideosResponse>>()
 
-    fun getMovies(page: Int) {
-        compositeDisposable.add(
-            movieRepository.getMovie(apiKey, page)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    movieList.postValue(Resource.success(it))
-                }, {
-                    movieList.postValue(Resource.error(it.localizedMessage, null))
-                })
-        )
+    val getMovies = Pager(PagingConfig(pageSize = 10, enablePlaceholders = true, maxSize = 200)) {
+        MoviesPagingSource(movieRepository)
+    }.flow.cachedIn(viewModelScope)
 
+    suspend fun getMovieDetails(movieId: Long): MovieDetails {
+        return movieRepository.getMovieDetails(movieId, apiKey)
     }
 
-    fun getMovieDetails(movieId: Long) {
-        compositeDisposable.add(
-            movieRepository.getMovieDetails(movieId, apiKey)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    movieDetails.postValue(Resource.success(it))
 
-                }, {
-                    movieDetails.postValue(Resource.error(it.localizedMessage, null))
-
-                })
-        )
-
-    }
-
-    fun getVideos(movieId: Long) {
-        compositeDisposable.add(
-            movieRepository.getVideos(movieId, apiKey)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    movieVideos.postValue(Resource.success(it))
-                }, {
-                    movieVideos.postValue(Resource.error(it.localizedMessage, null))
-                })
-        )
+    suspend fun getVideos(movieId: Long): VideosResponse {
+        return movieRepository.getVideos(movieId, apiKey)
     }
 
     override fun onCleared() {
