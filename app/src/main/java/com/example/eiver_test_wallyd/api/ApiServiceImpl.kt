@@ -18,8 +18,8 @@ class ApiServiceImpl(
         return apiService.getMovieDetails(movieId, apiKey)
     }
 
-    override fun getMovieVideos(movieId: Long, apiKey: String): Single<VideosResponse> {
-        return apiService.getMovieVideos(movieId, apiKey)
+    override fun getVideos(movieId: Long, apiKey: String): Single<VideosResponse> {
+        return apiService.getVideos(movieId, apiKey)
     }
 
 }

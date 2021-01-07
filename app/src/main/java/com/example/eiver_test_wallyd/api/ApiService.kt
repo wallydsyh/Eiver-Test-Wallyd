@@ -22,7 +22,7 @@ interface ApiService {
     ): Single<MovieDetails>
 
     @GET("movie/{movie_id}/videos")
-    fun getMovieVideos(
+    fun getVideos(
         @Path("movie_id") movieId: Long,
         @Query("api_key") apiKey: String
     ): Single<VideosResponse>

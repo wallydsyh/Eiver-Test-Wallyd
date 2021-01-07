@@ -9,18 +9,17 @@ import com.bumptech.glide.request.RequestOptions
 
 class ImageUtils {
     fun displayImageFromUrl(
-        context: Context?, url: String?, imageView: ImageView?,
+        context: Context, url: String?, imageView: ImageView,
         placeholderDrawable: Drawable?
     ) {
         val myOptions = RequestOptions()
-            .dontAnimate()
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
             .frame(0)
             .placeholder(placeholderDrawable)
-        Glide.with(context!!)
+        Glide.with(context)
             .load(url)
             .apply(myOptions)
-            .into(imageView!!)
+            .into(imageView)
 
     }
 }

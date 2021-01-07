@@ -11,9 +11,8 @@ import com.example.eiver_test_wallyd.model.ImageMovie
 import com.example.eiver_test_wallyd.model.Movie
 import com.example.eiver_test_wallyd.utils.ImageUtils
 
-class MoviesAdapter() :
+class MoviesAdapter :
     RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder>(
-
     ) {
     private lateinit var binding: MovieItemBinding
     var movieList = emptyList<Movie>()
@@ -29,19 +28,22 @@ class MoviesAdapter() :
 
     override fun onBindViewHolder(holder: MoviesViewHolder, position: Int) {
         val item = movieList[position]
+        val context = holder.itemView.context
         binding.title.text = item.title
-        binding.date.text = item.releaseDate
+        (context.getString(R.string.release_date) + item.releaseDate).also {
+            binding.date.text = it
+        }
         binding.synopsis.text = item.overview
         val url = item.posterPath?.let {
             ImageMovie(it).medium
         }
         ImageUtils().displayImageFromUrl(
-            holder.itemView.context,
+            context,
             url.toString(),
             binding.poster,
             null
         )
-        holder.itemView.setOnClickListener{
+        holder.itemView.setOnClickListener {
             onMovieClick?.invoke(item)
         }
     }

@@ -1,6 +1,5 @@
 package com.example.eiver_test_wallyd.model
 
-import com.example.eiver_test_wallyd.model.Movie
 import com.google.gson.annotations.SerializedName
 
 data class MoviesResponse(

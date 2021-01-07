@@ -1,28 +1,24 @@
-package com.example.eiver_test_wallyd
+package com.example.eiver_test_wallyd.ui
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.eiver_test_wallyd.R
 import com.example.eiver_test_wallyd.adapter.MovieDetailsAdapter
 import com.example.eiver_test_wallyd.databinding.FragmentMovieDetailBinding
 import com.example.eiver_test_wallyd.model.ImageMovie
 import com.example.eiver_test_wallyd.model.Movie
+import com.example.eiver_test_wallyd.utils.Dialog
 import com.example.eiver_test_wallyd.utils.ImageUtils
 import com.example.eiver_test_wallyd.viewModel.MoviesViewModel
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
+import com.example.eiver_test_wallyd.utils.Status
 
-// TODO: Rename parameter arguments, choose names that match
 private const val ARG_MOVIE = "arg_movie"
 
 /**
@@ -31,7 +27,6 @@ private const val ARG_MOVIE = "arg_movie"
  * create an instance of this fragment.
  */
 class MovieDetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private var movie: Movie? = null
     private lateinit var binding: FragmentMovieDetailBinding
     private val moviesViewModel: MoviesViewModel by activityViewModels()
@@ -61,43 +56,67 @@ class MovieDetailFragment : Fragment() {
         setUpListener()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-    }
-
-
     private fun setUpListener() {
         binding.recyclerView.apply {
             layoutManager =
-                LinearLayoutManager(binding.root.context, LinearLayout.HORIZONTAL, false)
+                LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
             adapter = movieDetailsAdapter
-            movieDetailsAdapter.onVideoClick = {
-                (activity as MainActivity).initializePlayer(it)
-            }
-
         }
-
+        movieDetailsAdapter.binding?.youtubePlayerView?.let {
+            viewLifecycleOwner.lifecycle.addObserver(it)
+        };
     }
 
     private fun setupObserver() {
-        moviesViewModel.movieDetails.observe(viewLifecycleOwner, Observer {
-            binding.textViewTitle.text = it.title
-            binding.synopsis.text = it.overview
-            binding.textViewDate.text = it.releaseDate
-            val imageMovie = it.posterPath?.let { it1 -> ImageMovie(it1).large }
-            ImageUtils().displayImageFromUrl(
-                binding.root.context,
-                imageMovie.toString(),
-                binding.imageViewPoster,
-                null
-            )
+        moviesViewModel.movieDetails.observe(viewLifecycleOwner, Observer { resource ->
+            when (resource.status) {
+                Status.Loading -> updateLoadingIndicatorVisibility(true)
+                Status.Success -> {
+                    updateLoadingIndicatorVisibility(false)
+                    binding.textViewTitle.text = resource.data?.title
+                    binding.synopsis.text = resource.data?.overview
+                    val imageMovie = resource.data?.posterPath?.let { it1 -> ImageMovie(it1).large }
+                    ImageUtils().displayImageFromUrl(
+                        binding.root.context,
+                        imageMovie.toString(),
+                        binding.imageViewPoster,
+                        null
+                    )
+                }
+                Status.Error -> {
+                    updateLoadingIndicatorVisibility(false)
+                    Dialog().displayDialog(binding.root.context,
+                        getString(R.string.error_title),
+                        getString(
+                            R.string.error_message)).show()
+                }
+            }
+
         })
 
         moviesViewModel.movieVideos.observe(viewLifecycleOwner, Observer {
-            movieDetailsAdapter.videosList = it.results
-            movieDetailsAdapter.notifyDataSetChanged()
+
+            when (it.status) {
+                Status.Success -> {
+                    updateLoadingIndicatorVisibility(false)
+                    it.data?.let { videosResponse ->
+                        movieDetailsAdapter.videosList = videosResponse.results
+                        movieDetailsAdapter.notifyDataSetChanged()
+                    }
+                }
+                Status.Error -> {
+                    updateLoadingIndicatorVisibility(false)
+                }
+            }
 
         })
+    }
+
+    private fun updateLoadingIndicatorVisibility(enable: Boolean) {
+        when {
+            enable -> binding.loadingIndicator.visibility = View.VISIBLE
+            else -> binding.loadingIndicator.visibility = View.GONE
+        }
     }
 
     override fun onDestroy() {
@@ -108,15 +127,6 @@ class MovieDetailFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MovieDetailFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(movie: Movie) =
             MovieDetailFragment().apply {

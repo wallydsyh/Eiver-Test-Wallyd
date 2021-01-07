@@ -6,14 +6,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".SplashScreenFragment">
+        tools:context=".ui.SplashScreenFragment">
 
         <Button
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:text="Ok, got it"
+            android:text="@string/ok_got_it"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.455"
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:padding="16dp"
-            android:text="Welcome to the TMBD Movie app"
+            android:text="@string/splash_screen_title"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +38,7 @@
             android:layout_marginTop="24dp"
             android:gravity="center"
             android:padding="24dp"
-            android:text="This app has been created in sole purpose of displaying a list of populars videos, you can also view about the movies, such as the title, the release date and of course the trailer. Enjoy"
+            android:text="@string/splash_screen_description"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

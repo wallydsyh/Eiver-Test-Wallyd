@@ -6,7 +6,6 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class ApiClient {
-
     fun getClient(): ApiService {
         val client = OkHttpClient.Builder()
             .build()

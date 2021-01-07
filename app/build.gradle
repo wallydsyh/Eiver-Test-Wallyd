@@ -59,6 +59,8 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
     implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+
+    // glide
     implementation "com.github.bumptech.glide:glide:$glideVersion"
 
 
@@ -77,8 +79,6 @@ dependencies {
     // Room
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
-
-    implementation "com.google.android.exoplayer:exoplayer:$exoPlayer"
     implementation "com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5"
 
 

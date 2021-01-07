@@ -16,7 +16,8 @@
             android:background="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="photo of movie" />
 
         <TextView
             android:id="@+id/title"
@@ -24,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:textSize="15sp"
+            android:textSize="16sp"
             tools:text="title"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
