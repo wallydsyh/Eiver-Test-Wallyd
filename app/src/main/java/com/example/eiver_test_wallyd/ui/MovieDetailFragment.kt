@@ -1,5 +1,7 @@
 package com.example.eiver_test_wallyd.ui
 
+import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -38,6 +40,7 @@ class MovieDetailFragment : Fragment() {
     private lateinit var binding: FragmentMovieDetailBinding
     private val moviesViewModel: MoviesViewModel by activityViewModels()
     private lateinit var movieDetailsAdapter: MovieDetailsAdapter
+    private lateinit var mainActivity: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +48,8 @@ class MovieDetailFragment : Fragment() {
             movie = it.getParcelable(ARG_MOVIE)
         }
         movieDetailsAdapter = MovieDetailsAdapter()
+        mainActivity = activity as MainActivity
+
     }
 
     override fun onCreateView(
@@ -75,34 +80,39 @@ class MovieDetailFragment : Fragment() {
     }
 
     private fun setupObserver() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            movie?.id?.let {
-                moviesViewModel.getMovieDetails(it).run {
-                    binding.textViewTitle.text = this.title
-                    binding.textViewTitle.text = this.title
-                    binding.synopsis.text = this.overview
-                    val imageMovie = this.posterPath?.let { it1 -> ImageMovie(it1).large }
-                    ImageUtils().displayImageFromUrl(
-                        binding.root.context,
-                        imageMovie.toString(),
-                        binding.imageViewPoster,
-                        null
-                    )
-                }
-                moviesViewModel.getVideos(it).run {
-                    movieDetailsAdapter.videosList = this.results
-                    movieDetailsAdapter.notifyDataSetChanged()
+        mainActivity.updateLoadingIndicatorVisibility(true, binding.loadingIndicator)
+        if (mainActivity.isNetworkConnected()) {
+            viewLifecycleOwner.lifecycleScope.launch(Dialog().displayError(binding.root.context)) {
+                movie?.id?.let {
+                    moviesViewModel.getMovieDetails(it).run {
+                        mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
+                        binding.textViewTitle.text = this.title
+                        binding.synopsis.text = this.overview
+                        val imageMovie = this.posterPath?.let { it1 -> ImageMovie(it1).large }
+                        ImageUtils().displayImageFromUrl(
+                            binding.root.context,
+                            imageMovie.toString(),
+                            binding.imageViewPoster,
+                            null
+                        )
+                    }
+                    moviesViewModel.getVideos(it).run {
+                        movieDetailsAdapter.videosList = this.results
+                        movieDetailsAdapter.notifyDataSetChanged()
+                    }
                 }
             }
+        } else {
+            mainActivity.updateLoadingIndicatorVisibility(false,binding.loadingIndicator)
+            context?.let {
+                Dialog().displayDialog(it,
+                    context?.getString(R.string.error_title),
+                    context?.getString(R.string.error_message)).show()
+            }
         }
+
     }
 
-    private fun updateLoadingIndicatorVisibility(enable: Boolean) {
-        when {
-            enable -> binding.loadingIndicator.visibility = View.VISIBLE
-            else -> binding.loadingIndicator.visibility = View.GONE
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()

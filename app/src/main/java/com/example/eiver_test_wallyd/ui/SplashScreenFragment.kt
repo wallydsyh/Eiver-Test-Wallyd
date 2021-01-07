@@ -25,8 +25,12 @@ class SplashScreenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.button.setOnClickListener{
-           activity?.supportFragmentManager?.commit {
+        setListener()
+    }
+
+    private fun setListener() {
+        binding.button.setOnClickListener {
+            activity?.supportFragmentManager?.commit {
                 replace(R.id.fragment_container_view, MoviesFragment())
             }
         }

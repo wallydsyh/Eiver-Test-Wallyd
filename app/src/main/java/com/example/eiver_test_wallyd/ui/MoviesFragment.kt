@@ -28,11 +28,13 @@ class MoviesFragment : Fragment() {
     private val movieViewModel: MoviesViewModel by activityViewModels()
     private lateinit var binding: MoviesFragmentBinding
     lateinit var movieAdapter: MoviesAdapter
+    private lateinit var mainActivity: MainActivity
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         movieAdapter = MoviesAdapter()
+        mainActivity = activity as MainActivity
     }
 
     override fun onCreateView(
@@ -49,63 +51,37 @@ class MoviesFragment : Fragment() {
         setUpObserver()
     }
 
+
     private fun setUpListener() {
         binding.recyclerView.apply {
             layoutManager =
                 LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
             adapter = movieAdapter
-            movieAdapter.onMovieClick = {
-                displayMovieDetailFragment(it)
-            }
+            movieAdapter.onMovieClick = { mainActivity.displayMovieDetailFragment(it) }
         }
     }
 
-    private fun displayMovieDetailFragment(movie: Movie) {
-        activity?.supportFragmentManager?.commit {
-            replace(R.id.fragment_container_view, MovieDetailFragment.newInstance(movie))
-            addToBackStack(MovieDetailFragment.toString())
-        }
-    }
 
     private fun setUpObserver() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            movieViewModel.getMovies.collectLatest {
-                movieAdapter.submitData(it)
-
+        mainActivity.updateLoadingIndicatorVisibility(true, binding.loadingIndicator)
+        if (mainActivity.isNetworkConnected()) {
+            viewLifecycleOwner.lifecycleScope.launch(Dialog().displayError(binding.root.context)) {
+                movieViewModel.getMovies.collectLatest {
+                    mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
+                    movieAdapter.submitData(it)
+                }
+            }
+        } else {
+            mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
+            context?.let {
+                Dialog().displayDialog(it,
+                    context?.getString(R.string.error_title),
+                    context?.getString(R.string.error_message)).show()
             }
         }
 
-
-/*
-        movieViewModel.movieList.observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.Loading -> updateLoadingIndicatorVisibility(true)
-
-                Status.Success -> {
-                    updateLoadingIndicatorVisibility(false)
-                    it.data?.let { moviesResponse ->
-                        movieAdapter.movieList = moviesResponse.results
-                    }
-                    movieAdapter.notifyDataSetChanged()
-                }
-                Status.Error -> {
-                    updateLoadingIndicatorVisibility(false)
-                    Dialog().displayDialog(binding.root.context, getString(R.string.error_title),getString(
-                                            R.string.error_message)).show()
-                }
-            }
-
-        })
-
- */
     }
 
-    private fun updateLoadingIndicatorVisibility(enable: Boolean) {
-        when {
-            enable -> binding.loadingIndicator.visibility = View.VISIBLE
-            else -> binding.loadingIndicator.visibility = View.GONE
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()

@@ -17,7 +17,7 @@ class MovieDetailsAdapter :
 
     ) {
     private var videoId: String = ""
-     var binding: MovieDetailsItemBinding? = null
+    var binding: MovieDetailsItemBinding? = null
     var videosList = emptyList<Videos>()
     var onVideoClick: ((Videos) -> Unit)? = null
     var callback = object :

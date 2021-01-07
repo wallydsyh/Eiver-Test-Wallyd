@@ -16,7 +16,6 @@ import com.example.eiver_test_wallyd.utils.ImageUtils
 class MoviesAdapter :
     PagingDataAdapter<Movie, MoviesAdapter.MoviesViewHolder>(diffCallback) {
     private lateinit var binding: MovieItemBinding
-    var movieList = emptyList<Movie>()
     var onMovieClick: ((Movie) -> Unit)? = null
 
     class MoviesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
