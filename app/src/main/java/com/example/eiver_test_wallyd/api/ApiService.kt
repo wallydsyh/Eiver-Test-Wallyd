@@ -1,10 +1,8 @@
 package com.example.eiver_test_wallyd.api
 
-import androidx.lifecycle.MutableLiveData
 import com.example.eiver_test_wallyd.model.MovieDetails
 import com.example.eiver_test_wallyd.model.MoviesResponse
 import com.example.eiver_test_wallyd.model.VideosResponse
-import com.example.eiver_test_wallyd.utils.Resource
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

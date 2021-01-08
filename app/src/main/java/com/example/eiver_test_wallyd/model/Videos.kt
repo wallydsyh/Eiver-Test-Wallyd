@@ -5,5 +5,6 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class Videos(
+    val id: String,
     val key: String
 ) : Parcelable

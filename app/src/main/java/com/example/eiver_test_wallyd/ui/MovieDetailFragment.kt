@@ -1,21 +1,14 @@
 package com.example.eiver_test_wallyd.ui
 
-import android.app.AlertDialog
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
-import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.eiver_test_wallyd.Constant.ApiKey
 import com.example.eiver_test_wallyd.R
 import com.example.eiver_test_wallyd.adapter.MovieDetailsAdapter
 import com.example.eiver_test_wallyd.databinding.FragmentMovieDetailBinding
@@ -23,9 +16,7 @@ import com.example.eiver_test_wallyd.model.ImageMovie
 import com.example.eiver_test_wallyd.model.Movie
 import com.example.eiver_test_wallyd.utils.Dialog
 import com.example.eiver_test_wallyd.utils.ImageUtils
-import com.example.eiver_test_wallyd.utils.Resource
 import com.example.eiver_test_wallyd.viewModel.MoviesViewModel
-import com.example.eiver_test_wallyd.utils.Status
 import kotlinx.coroutines.*
 
 private const val ARG_MOVIE = "arg_movie"
@@ -47,7 +38,6 @@ class MovieDetailFragment : Fragment() {
         arguments?.let {
             movie = it.getParcelable(ARG_MOVIE)
         }
-        movieDetailsAdapter = MovieDetailsAdapter()
         mainActivity = activity as MainActivity
 
     }
@@ -59,6 +49,8 @@ class MovieDetailFragment : Fragment() {
         // Inflate the layout for this fragment
         binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_movie_detail, container, false)
+        movieDetailsAdapter = MovieDetailsAdapter(viewLifecycleOwner.lifecycle)
+
         return binding.root
     }
 
@@ -74,9 +66,6 @@ class MovieDetailFragment : Fragment() {
                 LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
             adapter = movieDetailsAdapter
         }
-        movieDetailsAdapter.binding?.youtubePlayerView?.let {
-            viewLifecycleOwner.lifecycle.addObserver(it)
-        }
     }
 
     private fun setupObserver() {
@@ -85,7 +74,8 @@ class MovieDetailFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch(Dialog().displayError(binding.root.context)) {
                 movie?.id?.let {
                     moviesViewModel.getMovieDetails(it).run {
-                        mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
+                        mainActivity.updateLoadingIndicatorVisibility(false,
+                            binding.loadingIndicator)
                         binding.textViewTitle.text = this.title
                         binding.synopsis.text = this.overview
                         val imageMovie = this.posterPath?.let { it1 -> ImageMovie(it1).large }
@@ -97,13 +87,12 @@ class MovieDetailFragment : Fragment() {
                         )
                     }
                     moviesViewModel.getVideos(it).run {
-                        movieDetailsAdapter.videosList = this.results
-                        movieDetailsAdapter.notifyDataSetChanged()
+                        movieDetailsAdapter.submitList(this.results)
                     }
                 }
             }
         } else {
-            mainActivity.updateLoadingIndicatorVisibility(false,binding.loadingIndicator)
+            mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
             context?.let {
                 Dialog().displayDialog(it,
                     context?.getString(R.string.error_title),
@@ -111,14 +100,6 @@ class MovieDetailFragment : Fragment() {
             }
         }
 
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        movieDetailsAdapter.binding?.youtubePlayerView?.removeYouTubePlayerListener(
-            movieDetailsAdapter.callback
-        )
     }
 
     companion object {

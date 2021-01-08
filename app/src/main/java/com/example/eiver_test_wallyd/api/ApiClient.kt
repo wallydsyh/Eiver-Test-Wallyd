@@ -1,5 +1,6 @@
 package com.example.eiver_test_wallyd.api
 
+import com.example.eiver_test_wallyd.Constant.ApiKey.BASE_URL
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
@@ -17,9 +18,5 @@ class ApiClient {
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .build()
             .create(ApiService::class.java)
-    }
-
-    companion object {
-        private const val BASE_URL = "https://api.themoviedb.org/3/"
     }
 }

@@ -11,7 +11,7 @@ class MoviesPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Movie> {
         val position = params.key ?: 1
         return try {
-            val data = repository.getMovie(ApiKey.apiKey, position)
+            val data = repository.getMovie(ApiKey.API_KEY, position)
             data.run {
                 LoadResult.Page(data = this.results,
                     prevKey = if (position == 1) null else position - 1,
