@@ -19,4 +19,5 @@ I chose the go with the MVVM architecture because it’s more befitting for this
 To load Images I used Glide, I could have gone with Picasso, or ImageLoader, but I chose Glide because of its network and cache performances
 
 For implementing the infite scroll and the pagination I used Paging Library 3 developped by google which is still in beta state
-![alt text](http://url/to/https://47nosttp48gk7rjdt766zy4wuhgwwg.files-sashido.cloud/6a00a68cf8659b2b76157d1da9151b43_133594962db7ed30325c6518d9ee898f_photo.jpg)
+
+
