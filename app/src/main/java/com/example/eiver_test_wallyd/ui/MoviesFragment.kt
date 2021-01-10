@@ -1,16 +1,19 @@
 package com.example.eiver_test_wallyd.ui
 
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
+import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.eiver_test_wallyd.R
 import com.example.eiver_test_wallyd.adapter.MoviesAdapter
+import com.example.eiver_test_wallyd.adapter.MoviesLoadStateAdapter
 import com.example.eiver_test_wallyd.databinding.MoviesFragmentBinding
 import com.example.eiver_test_wallyd.utils.Dialog
 import com.example.eiver_test_wallyd.viewModel.MoviesViewModel
@@ -22,12 +25,36 @@ class MoviesFragment : Fragment() {
     private lateinit var binding: MoviesFragmentBinding
     lateinit var movieAdapter: MoviesAdapter
     private lateinit var mainActivity: MainActivity
+    private var searchCallback = object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(query: String?): Boolean {
+            return false
+        }
 
+        override fun onQueryTextChange(newText: String?): Boolean {
+            binding.recyclerView.recycledViewPool.clear()
+            lifecycleScope.launch {
+                when {
+                    newText.toString().isBlank() -> {
+                        movieViewModel.getMovies().collectLatest {
+                            movieAdapter.submitData(it)
+                        }
+                    }
+                    else -> {
+                        movieViewModel.searchMovie(newText.toString()).collectLatest {
+                            movieAdapter.submitData(it)
+                        }
+                    }
+                }
+            }
+            return true
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         movieAdapter = MoviesAdapter()
         mainActivity = activity as MainActivity
+
     }
 
     override fun onCreateView(
@@ -35,6 +62,8 @@ class MoviesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.movies_fragment, container, false)
+        mainActivity.supportActionBar?.title = getString(R.string.title_movies)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -44,13 +73,28 @@ class MoviesFragment : Fragment() {
         setUpObserver()
     }
 
-
     private fun setUpListener() {
         binding.recyclerView.apply {
             layoutManager =
                 LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-            adapter = movieAdapter
+            adapter = movieAdapter.withLoadStateFooter(MoviesLoadStateAdapter {
+                movieAdapter.retry()
+            })
             movieAdapter.onMovieClick = { mainActivity.displayMovieDetailFragment(it) }
+        }
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_search, menu)
+
+        // Get the SearchView and set the searchable configuration
+        val searchManager = mainActivity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        (menu.findItem(R.id.menu_search).actionView as SearchView).apply {
+            // Assumes current activity is the searchable activity
+            setSearchableInfo(searchManager.getSearchableInfo(mainActivity.componentName))
+            setIconifiedByDefault(false)
+            setOnQueryTextListener(searchCallback)
         }
     }
 
@@ -59,7 +103,7 @@ class MoviesFragment : Fragment() {
         mainActivity.updateLoadingIndicatorVisibility(true, binding.loadingIndicator)
         if (mainActivity.isNetworkConnected()) {
             viewLifecycleOwner.lifecycleScope.launch(Dialog().displayError(binding.root.context)) {
-                movieViewModel.getMovies.collectLatest {
+                movieViewModel.getMovies().collectLatest {
                     mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
                     movieAdapter.submitData(it)
                 }

@@ -30,7 +30,7 @@ class MoviesAdapter :
         val item = getItem(position)
         val context = holder.itemView.context
         binding.title.text = item?.title
-        (context.getString(R.string.release_date) + item?.releaseDate).also {
+        (context.getString(R.string.release_date) + " " + item?.releaseDate).also {
             binding.date.text = it
         }
         binding.synopsis.text = item?.overview
@@ -40,8 +40,7 @@ class MoviesAdapter :
         ImageUtils().displayImageFromUrl(
             context,
             url.toString(),
-            binding.poster,
-            null
+            binding.poster
         )
         holder.itemView.setOnClickListener {
             item?.let { it1 -> onMovieClick?.invoke(it1) }

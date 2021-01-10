@@ -15,9 +15,9 @@
             <ImageView
                 android:id="@+id/imageView_poster"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:contentDescription="photo of movie"
+                android:contentDescription="@string/content_description_poster"
                 android:scaleType="centerCrop"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +29,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:textSize="15sp"
+                android:textColor="@color/blue_700"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -41,18 +42,27 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/dark_blue"
                 app:layout_constraintEnd_toEndOf="@+id/textView_title"
                 app:layout_constraintStart_toStartOf="@+id/textView_title"
                 app:layout_constraintTop_toBottomOf="@+id/textView_title"
                 tools:text="synopsis" />
 
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/synopsis" />
+
 
             <ProgressBar
                 android:id="@+id/loading_indicator"

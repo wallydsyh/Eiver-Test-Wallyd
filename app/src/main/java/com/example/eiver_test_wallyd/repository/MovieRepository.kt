@@ -8,4 +8,5 @@ class MovieRepository(private val apiHelper: ApiHelper) {
         apiHelper.getMovieDetails(movieId, apiKey)
 
     suspend fun getVideos(movieId: Long, apiKey: String) = apiHelper.getVideos(movieId, apiKey)
+    suspend fun searchMovie(query: String, page: Int,  apiKey: String) = apiHelper.searchMovie(query,page, apiKey)
 }

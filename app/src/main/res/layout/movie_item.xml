@@ -13,11 +13,10 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:scaleType="centerCrop"
-            android:background="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="photo of movie" />
+            android:contentDescription="@string/photo_of_movie" />
 
         <TextView
             android:id="@+id/title"
@@ -25,9 +24,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:textSize="16sp"
+            android:textSize="18sp"
             tools:text="title"
             android:textStyle="bold"
+            android:textColor="@color/blue_700"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/poster"
             app:layout_constraintTop_toTopOf="@id/poster" />
@@ -36,6 +36,8 @@
             android:id="@+id/date"
             android:layout_width="0dp"
             tools:text="date"
+            android:textSize="14sp"
+            android:textColor="@color/dark_blue"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="@id/title"
             app:layout_constraintStart_toStartOf="@id/title"
@@ -47,6 +49,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:maxLines="3"
+            android:ellipsize="end"
+            android:textSize="16sp"
             android:scrollbars="horizontal"
             app:layout_constraintEnd_toEndOf="@+id/date"
             app:layout_constraintStart_toStartOf="@+id/date"

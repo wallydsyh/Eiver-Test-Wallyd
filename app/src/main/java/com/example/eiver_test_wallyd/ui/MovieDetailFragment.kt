@@ -56,6 +56,7 @@ class MovieDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mainActivity.supportActionBar?.title = getString(R.string.title_movie_details)
         setupObserver()
         setUpListener()
     }
@@ -82,8 +83,7 @@ class MovieDetailFragment : Fragment() {
                         ImageUtils().displayImageFromUrl(
                             binding.root.context,
                             imageMovie.toString(),
-                            binding.imageViewPoster,
-                            null
+                            binding.imageViewPoster
                         )
                     }
                     moviesViewModel.getVideos(it).run {

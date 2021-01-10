@@ -21,4 +21,8 @@ class ApiServiceImpl(
         return apiService.getVideos(movieId, apiKey)
     }
 
+    override suspend fun searchMovie(query: String, page: Int, apiKey: String): MoviesResponse {
+        return  apiService.searchMovie(query, page, apiKey)
+    }
+
 }

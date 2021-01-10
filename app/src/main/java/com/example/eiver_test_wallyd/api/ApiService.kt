@@ -26,5 +26,12 @@ interface ApiService {
         @Query("api_key") apiKey: String
     ): VideosResponse
 
+    @GET("search/movie")
+    suspend fun searchMovie(
+        @Query("query") query: String,
+        @Query("page") page: Int,
+        @Query("api_key") apiKey: String
+    ): MoviesResponse
+
 
 }
