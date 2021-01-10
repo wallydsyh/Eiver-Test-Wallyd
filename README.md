@@ -10,6 +10,7 @@ Features :
 - Infite Scroll (Pagination)
 - Search for a movie
 - Handle NetWork Failure
+- Handle Configuration Changes
 
 Technical Decisions:
 
