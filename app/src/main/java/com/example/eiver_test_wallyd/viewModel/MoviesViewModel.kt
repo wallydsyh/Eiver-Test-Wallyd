@@ -11,10 +11,15 @@ import com.example.eiver_test_wallyd.SearchMoviesPagingSource
 import com.example.eiver_test_wallyd.model.*
 import com.example.eiver_test_wallyd.repository.MovieRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 class MoviesViewModel(
-    private val movieRepository: MovieRepository
+    private val movieRepository: MovieRepository,
 ) : ViewModel() {
+
+    var movieDetails = MutableLiveData<MovieDetails>()
+    val videos = MutableLiveData<VideosResponse>()
+
 
     fun getMovies(): Flow<PagingData<Movie>> {
         return Pager(PagingConfig(pageSize = 100)) {
@@ -28,11 +33,20 @@ class MoviesViewModel(
         }.flow.cachedIn(viewModelScope)
     }
 
-    suspend fun getMovieDetails(movieId: Long): MovieDetails {
-        return movieRepository.getMovieDetails(movieId, API_KEY)
+
+    fun getMovieDetails(movieId: Long) {
+        viewModelScope.launch {
+            movieRepository.getMovieDetails(movieId, API_KEY).run {
+                movieDetails.postValue(this)
+            }
+        }
     }
 
-    suspend fun getVideos(movieId: Long): VideosResponse {
-        return movieRepository.getVideos(movieId, API_KEY)
+    fun getVideos(movieId: Long) {
+        viewModelScope.launch {
+            movieRepository.getVideos(movieId, API_KEY).run {
+                videos.postValue(this)
+            }
+        }
     }
 }

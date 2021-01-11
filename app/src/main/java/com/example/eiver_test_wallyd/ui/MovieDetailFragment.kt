@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.eiver_test_wallyd.R
 import com.example.eiver_test_wallyd.adapter.MovieDetailsAdapter
@@ -17,7 +16,6 @@ import com.example.eiver_test_wallyd.model.Movie
 import com.example.eiver_test_wallyd.utils.Dialog
 import com.example.eiver_test_wallyd.utils.ImageUtils
 import com.example.eiver_test_wallyd.viewModel.MoviesViewModel
-import kotlinx.coroutines.*
 
 private const val ARG_MOVIE = "arg_movie"
 
@@ -44,13 +42,12 @@ class MovieDetailFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
         binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_movie_detail, container, false)
         movieDetailsAdapter = MovieDetailsAdapter(viewLifecycleOwner.lifecycle)
-
         return binding.root
     }
 
@@ -72,25 +69,27 @@ class MovieDetailFragment : Fragment() {
     private fun setupObserver() {
         mainActivity.updateLoadingIndicatorVisibility(true, binding.loadingIndicator)
         if (mainActivity.isNetworkConnected()) {
-            viewLifecycleOwner.lifecycleScope.launch(Dialog().displayError(binding.root.context)) {
-                movie?.id?.let {
-                    moviesViewModel.getMovieDetails(it).run {
-                        mainActivity.updateLoadingIndicatorVisibility(false,
-                            binding.loadingIndicator)
-                        binding.textViewTitle.text = this.title
-                        binding.synopsis.text = this.overview
-                        val imageMovie = this.posterPath?.let { it1 -> ImageMovie(it1).large }
-                        ImageUtils().displayImageFromUrl(
-                            binding.root.context,
-                            imageMovie.toString(),
-                            binding.imageViewPoster
-                        )
-                    }
-                    moviesViewModel.getVideos(it).run {
-                        movieDetailsAdapter.submitList(this.results)
-                    }
-                }
+            movie?.id?.let {
+                moviesViewModel.getMovieDetails(it)
+                moviesViewModel.getVideos(it)
             }
+            moviesViewModel.videos.observe(viewLifecycleOwner, {
+                movieDetailsAdapter.submitList(it.results)
+
+            })
+            moviesViewModel.movieDetails.observe(viewLifecycleOwner, {
+                mainActivity.updateLoadingIndicatorVisibility(false,
+                    binding.loadingIndicator)
+                binding.textViewTitle.text = it.title
+                binding.synopsis.text = it.overview
+                val imageMovie = it.posterPath?.let { it1 -> ImageMovie(it1).large }
+                ImageUtils().displayImageFromUrl(
+                    binding.root.context,
+                    imageMovie.toString(),
+                    binding.imageViewPoster
+                )
+
+            })
         } else {
             mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
             context?.let {
