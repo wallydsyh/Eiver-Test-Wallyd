@@ -1,17 +1,18 @@
-package com.example.eiver_test_wallyd
+package com.example.eiver_test_wallyd.viewModel.pagingSource
 
 import androidx.paging.PagingSource
 import com.example.eiver_test_wallyd.Constant.ApiKey
 import com.example.eiver_test_wallyd.model.Movie
 import com.example.eiver_test_wallyd.repository.MovieRepository
 
-class MoviesPagingSource(
-    private val repository: MovieRepository
+class SearchMoviesPagingSource(
+    private val repository: MovieRepository,
+    private val query: String
 ) : PagingSource<Int, Movie>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Movie> {
         val position = params.key ?: 1
         return try {
-            val data = repository.getMovie(ApiKey.API_KEY, position)
+            val data = repository.searchMovie(query, position, ApiKey.API_KEY)
             data.run {
                 LoadResult.Page(data = this.results,
                     prevKey = if (position == 1) null else position - 1,

@@ -6,8 +6,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.eiver_test_wallyd.Constant.ApiKey.API_KEY
-import com.example.eiver_test_wallyd.MoviesPagingSource
-import com.example.eiver_test_wallyd.SearchMoviesPagingSource
+import com.example.eiver_test_wallyd.viewModel.pagingSource.MoviesPagingSource
+import com.example.eiver_test_wallyd.viewModel.pagingSource.SearchMoviesPagingSource
 import com.example.eiver_test_wallyd.model.*
 import com.example.eiver_test_wallyd.repository.MovieRepository
 import kotlinx.coroutines.flow.Flow
