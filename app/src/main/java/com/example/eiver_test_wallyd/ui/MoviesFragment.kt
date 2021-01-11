@@ -10,7 +10,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.eiver_test_wallyd.R
 import com.example.eiver_test_wallyd.adapter.MoviesAdapter
 import com.example.eiver_test_wallyd.adapter.MoviesLoadStateAdapter
@@ -84,21 +83,6 @@ class MoviesFragment : Fragment() {
         }
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_search, menu)
-
-        // Get the SearchView and set the searchable configuration
-        val searchManager = mainActivity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        (menu.findItem(R.id.menu_search).actionView as SearchView).apply {
-            // Assumes current activity is the searchable activity
-            setSearchableInfo(searchManager.getSearchableInfo(mainActivity.componentName))
-            setIconifiedByDefault(false)
-            setOnQueryTextListener(searchCallback)
-        }
-    }
-
-
     private fun setUpObserver() {
         mainActivity.updateLoadingIndicatorVisibility(true, binding.loadingIndicator)
         if (mainActivity.isNetworkConnected()) {
@@ -119,6 +103,18 @@ class MoviesFragment : Fragment() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_search, menu)
+
+        // Get the SearchView and set the searchable configuration
+        val searchManager = mainActivity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        (menu.findItem(R.id.menu_search).actionView as SearchView).apply {
+            // Assumes current activity is the searchable activity
+            setSearchableInfo(searchManager.getSearchableInfo(mainActivity.componentName))
+            setIconifiedByDefault(false)
+            setOnQueryTextListener(searchCallback)
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()

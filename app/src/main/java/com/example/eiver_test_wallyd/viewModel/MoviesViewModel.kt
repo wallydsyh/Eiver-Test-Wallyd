@@ -14,12 +14,18 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.Flow
 
 class MoviesViewModel(
-    private val movieRepository: MovieRepository
+    private val movieRepository: MovieRepository,
 ) : ViewModel() {
 
     fun getMovies(): Flow<PagingData<Movie>> {
         return Pager(PagingConfig(pageSize = 10, enablePlaceholders = true, maxSize = 200)) {
             MoviesPagingSource(movieRepository)
+        }.flow.cachedIn(viewModelScope)
+    }
+
+    fun searchMovie(query: String): Flow<PagingData<Movie>> {
+        return Pager(PagingConfig(pageSize = 10, enablePlaceholders = true, maxSize = 200)) {
+            SearchMoviesPagingSource(movieRepository, query)
         }.flow.cachedIn(viewModelScope)
     }
 
@@ -29,11 +35,5 @@ class MoviesViewModel(
 
     suspend fun getVideos(movieId: Long): VideosResponse {
         return movieRepository.getVideos(movieId, API_KEY)
-    }
-
-    fun searchMovie(query: String): Flow<PagingData<Movie>> {
-        return Pager(PagingConfig(pageSize = 10, enablePlaceholders = true, maxSize = 200)) {
-            SearchMoviesPagingSource(movieRepository, query)
-        }.flow.cachedIn(viewModelScope)
     }
 }
