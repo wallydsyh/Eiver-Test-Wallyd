@@ -10,21 +10,20 @@ import com.example.eiver_test_wallyd.MoviesPagingSource
 import com.example.eiver_test_wallyd.SearchMoviesPagingSource
 import com.example.eiver_test_wallyd.model.*
 import com.example.eiver_test_wallyd.repository.MovieRepository
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.Flow
 
 class MoviesViewModel(
-    private val movieRepository: MovieRepository,
+    private val movieRepository: MovieRepository
 ) : ViewModel() {
 
     fun getMovies(): Flow<PagingData<Movie>> {
-        return Pager(PagingConfig(pageSize = 10, enablePlaceholders = true, maxSize = 200)) {
+        return Pager(PagingConfig(pageSize = 100)) {
             MoviesPagingSource(movieRepository)
         }.flow.cachedIn(viewModelScope)
     }
 
     fun searchMovie(query: String): Flow<PagingData<Movie>> {
-        return Pager(PagingConfig(pageSize = 10, enablePlaceholders = true, maxSize = 200)) {
+        return Pager(PagingConfig(pageSize = 100, enablePlaceholders = true)) {
             SearchMoviesPagingSource(movieRepository, query)
         }.flow.cachedIn(viewModelScope)
     }

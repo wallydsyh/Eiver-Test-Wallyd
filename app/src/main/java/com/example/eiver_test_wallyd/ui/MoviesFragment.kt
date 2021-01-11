@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.eiver_test_wallyd.R
 import com.example.eiver_test_wallyd.adapter.MoviesAdapter
 import com.example.eiver_test_wallyd.adapter.MoviesLoadStateAdapter
@@ -34,9 +35,7 @@ class MoviesFragment : Fragment() {
             lifecycleScope.launch {
                 when {
                     newText.toString().isBlank() -> {
-                        movieViewModel.getMovies().collectLatest {
-                            movieAdapter.submitData(it)
-                        }
+                        getMovies()
                     }
                     else -> {
                         movieViewModel.searchMovie(newText.toString()).collectLatest {
@@ -58,7 +57,7 @@ class MoviesFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.movies_fragment, container, false)
         mainActivity.supportActionBar?.title = getString(R.string.title_movies)
@@ -79,7 +78,16 @@ class MoviesFragment : Fragment() {
             adapter = movieAdapter.withLoadStateFooter(MoviesLoadStateAdapter {
                 movieAdapter.retry()
             })
+            movieAdapter.stateRestorationPolicy =
+                RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             movieAdapter.onMovieClick = { mainActivity.displayMovieDetailFragment(it) }
+        }
+    }
+
+    private suspend fun getMovies() {
+        movieViewModel.getMovies().collectLatest {
+            mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
+            movieAdapter.submitData(it)
         }
     }
 
@@ -87,10 +95,7 @@ class MoviesFragment : Fragment() {
         mainActivity.updateLoadingIndicatorVisibility(true, binding.loadingIndicator)
         if (mainActivity.isNetworkConnected()) {
             viewLifecycleOwner.lifecycleScope.launch(Dialog().displayError(binding.root.context)) {
-                movieViewModel.getMovies().collectLatest {
-                    mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
-                    movieAdapter.submitData(it)
-                }
+                getMovies()
             }
         } else {
             mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
