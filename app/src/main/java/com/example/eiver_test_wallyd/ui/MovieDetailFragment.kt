@@ -1,19 +1,20 @@
 package com.example.eiver_test_wallyd.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.eiver_test_wallyd.R
 import com.example.eiver_test_wallyd.adapter.MovieDetailsAdapter
 import com.example.eiver_test_wallyd.databinding.FragmentMovieDetailBinding
 import com.example.eiver_test_wallyd.model.ImageMovie
 import com.example.eiver_test_wallyd.model.Movie
-import com.example.eiver_test_wallyd.utils.Dialog
 import com.example.eiver_test_wallyd.utils.ImageUtils
 import com.example.eiver_test_wallyd.viewModel.MoviesViewModel
 
@@ -25,7 +26,6 @@ private const val ARG_MOVIE = "arg_movie"
  * create an instance of this fragment.
  */
 class MovieDetailFragment : Fragment() {
-    private var movie: Movie? = null
     private lateinit var binding: FragmentMovieDetailBinding
     private val moviesViewModel: MoviesViewModel by activityViewModels()
     private lateinit var movieDetailsAdapter: MovieDetailsAdapter
@@ -33,9 +33,6 @@ class MovieDetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            movie = it.getParcelable(ARG_MOVIE)
-        }
         mainActivity = activity as MainActivity
 
     }
@@ -68,36 +65,30 @@ class MovieDetailFragment : Fragment() {
 
     private fun setupObserver() {
         mainActivity.updateLoadingIndicatorVisibility(true, binding.loadingIndicator)
-        if (mainActivity.isNetworkConnected()) {
-            movie?.id?.let {
-                moviesViewModel.getMovieDetails(it)
-                moviesViewModel.getVideos(it)
-            }
-            moviesViewModel.videos.observe(viewLifecycleOwner, {
-                movieDetailsAdapter.submitList(it.results)
 
-            })
-            moviesViewModel.movieDetails.observe(viewLifecycleOwner, {
+        moviesViewModel.videos.observe(viewLifecycleOwner, {
+            movieDetailsAdapter.submitList(it.results)
+        })
+        moviesViewModel.videos.observe(viewLifecycleOwner, {
+            movieDetailsAdapter.submitList(it.results)
+
+        })
+        moviesViewModel.movieDetails.observe(viewLifecycleOwner, {
+            if (it.isSuccessful) {
                 mainActivity.updateLoadingIndicatorVisibility(false,
                     binding.loadingIndicator)
-                binding.textViewTitle.text = it.title
-                binding.synopsis.text = it.overview
-                val imageMovie = it.posterPath?.let { it1 -> ImageMovie(it1).large }
+                binding.textViewTitle.text = it.body()?.title
+                binding.synopsis.text = it.body()?.overview
+                val imageMovie = it.body()?.posterPath?.let { it1 -> ImageMovie(it1).large }
                 ImageUtils().displayImageFromUrl(
                     binding.root.context,
                     imageMovie.toString(),
                     binding.imageViewPoster
                 )
-
-            })
-        } else {
-            mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
-            context?.let {
-                Dialog().displayDialog(it,
-                    context?.getString(R.string.error_title),
-                    context?.getString(R.string.error_message)).show()
+            } else {
+                Toast.makeText(context, "error ${it.errorBody()}", Toast.LENGTH_LONG).show()
             }
-        }
+        })
 
     }
 

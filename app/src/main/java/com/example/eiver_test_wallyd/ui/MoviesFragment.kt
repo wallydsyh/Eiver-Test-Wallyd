@@ -5,8 +5,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MoviesFragment : Fragment() {
-    private val movieViewModel: MoviesViewModel by activityViewModels()
+    private val moviesViewModel: MoviesViewModel by activityViewModels()
     private lateinit var binding: MoviesFragmentBinding
     lateinit var movieAdapter: MoviesAdapter
     private lateinit var mainActivity: MainActivity
@@ -38,7 +38,7 @@ class MoviesFragment : Fragment() {
                         getMovies()
                     }
                     else -> {
-                        movieViewModel.searchMovie(newText.toString()).collectLatest {
+                        moviesViewModel.searchMovie(newText.toString()).collectLatest {
                             movieAdapter.submitData(it)
                         }
                     }
@@ -80,12 +80,16 @@ class MoviesFragment : Fragment() {
             })
             movieAdapter.stateRestorationPolicy =
                 RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            movieAdapter.onMovieClick = { mainActivity.displayMovieDetailFragment(it) }
+            movieAdapter.onMovieClick = {
+                mainActivity.displayMovieDetailFragment(it)
+                moviesViewModel.getMovieDetails(it.id)
+                moviesViewModel.getVideos(it.id)
+            }
         }
     }
 
     private suspend fun getMovies() {
-        movieViewModel.getMovies().collectLatest {
+        moviesViewModel.getMovies().collectLatest {
             mainActivity.updateLoadingIndicatorVisibility(false, binding.loadingIndicator)
             movieAdapter.submitData(it)
         }

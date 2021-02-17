@@ -20,23 +20,21 @@ import com.example.eiver_test_wallyd.viewModel.ViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var moviesViewModel: MoviesViewModel
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        setUpViewModel()
         if (savedInstanceState == null) {
             displaySplashScreen()
         }
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        setUpViewModel()
     }
 
     private fun setUpViewModel() {
-        moviesViewModel =
-            ViewModelProvider(this, ViewModelFactory(ApiHelper(ApiServiceImpl()))).get(
-                MoviesViewModel::class.java
-            )
+        ViewModelProvider(this, ViewModelFactory(ApiHelper(ApiServiceImpl()))).get(
+            MoviesViewModel::class.java
+        )
     }
 
     fun isNetworkConnected(): Boolean {

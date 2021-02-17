@@ -3,6 +3,7 @@ package com.example.eiver_test_wallyd.api
 import com.example.eiver_test_wallyd.model.MovieDetails
 import com.example.eiver_test_wallyd.model.MoviesResponse
 import com.example.eiver_test_wallyd.model.VideosResponse
+import retrofit2.Response
 
 
 class ApiServiceImpl(
@@ -13,7 +14,7 @@ class ApiServiceImpl(
         return apiService.getMovies(apiKey, page)
     }
 
-    override suspend fun getMovieDetails(movieId: Long, apiKey: String): MovieDetails {
+    override suspend fun getMovieDetails(movieId: Long, apiKey: String): Response<MovieDetails> {
         return apiService.getMovieDetails(movieId, apiKey)
     }
 

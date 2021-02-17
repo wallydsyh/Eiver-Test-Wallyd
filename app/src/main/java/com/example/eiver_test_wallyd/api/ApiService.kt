@@ -3,6 +3,7 @@ package com.example.eiver_test_wallyd.api
 import com.example.eiver_test_wallyd.model.MovieDetails
 import com.example.eiver_test_wallyd.model.MoviesResponse
 import com.example.eiver_test_wallyd.model.VideosResponse
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -18,7 +19,7 @@ interface ApiService {
     suspend fun getMovieDetails(
         @Path("movie_id") movieId: Long,
         @Query("api_key") apiKey: String
-    ): MovieDetails
+    ): Response<MovieDetails>
 
     @GET("movie/{movie_id}/videos")
     suspend fun getVideos(

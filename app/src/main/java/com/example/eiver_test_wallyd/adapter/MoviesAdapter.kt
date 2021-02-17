@@ -43,7 +43,7 @@ class MoviesAdapter :
             binding.poster
         )
         holder.itemView.setOnClickListener {
-            item?.let { it1 -> onMovieClick?.invoke(it1) }
+            item?.let { id -> onMovieClick?.invoke(id) }
         }
     }
 
